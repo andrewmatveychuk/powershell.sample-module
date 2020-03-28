@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>SampleModule</id>
+    <version>0.0.1</version>
+    <authors>Andrew Matveychuk</authors>
+    <description>A sample PowerShell module.</description>
+    <copyright>(c) Andrew Matveychuk.</copyright>
+    <licenseUrl>https://github.com/andrewmatveychuk/powershell.sample-module/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/andrewmatveychuk/powershell.sample-module</projectUrl>
+  </metadata>
+</package>
