@@ -8,7 +8,7 @@
     This script contains the tasks for building the 'SampleModule' PowerShell module
 #>
 
-Set-StrictMode -Version 1.0
+Set-StrictMode -Version Latest
 
 # Synopsis: Default task
 task . Build
