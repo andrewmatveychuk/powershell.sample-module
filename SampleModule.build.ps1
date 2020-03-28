@@ -21,8 +21,8 @@ task CleanBuild Clean, Build
 
 # Setting build script variables
 $moduleName = 'SampleModule'
-$moduleSourcePath = Join-Path -Path $PSScriptRoot -ChildPath $moduleName
-$buildOutputPath = Join-Path -Path $PSScriptRoot -ChildPath 'build'
+$moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
+$buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
 
 # Setting base module version
 $newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
