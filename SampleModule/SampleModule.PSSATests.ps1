@@ -5,15 +5,13 @@ $moduleName = Split-Path -Path $modulePath -Leaf
 
 Describe "'$moduleName' Module Analysis with PSScriptAnalyzer" {
     Context 'Standard Rules' {
-        $analysis = Invoke-ScriptAnalyzer -Path "$here\$moduleName.psm1"
-        $scriptAnalyzerRules = Get-ScriptAnalyzerRule
+        # Define PSScriptAnalyzer rules
+        $scriptAnalyzerRules = Get-ScriptAnalyzerRule # Just getting all default rules
 
+        # Perform analysis against each rule
         forEach ($rule in $scriptAnalyzerRules) {
             It "should pass '$rule' rule" {
-                If ($analysis.RuleName -contains $rule) {
-                    $analysis | Where-Object RuleName -EQ $rule -OutVariable failures | Out-Default
-                    $failures.Count | Should -Be 0
-                }
+                Invoke-ScriptAnalyzer -Path "$here\$moduleName.psm1" -IncludeRule $rule | Should -BeNullOrEmpty
             }
         }
     }
@@ -34,15 +32,13 @@ foreach ($functionPath in $functionPaths) {
 
     Describe "'$functionName' Function Analysis with PSScriptAnalyzer" {
         Context 'Standard Rules' {
-            $analysis = Invoke-ScriptAnalyzer -Path $functionPath
-            $scriptAnalyzerRules = Get-ScriptAnalyzerRule
+            # Define PSScriptAnalyzer rules
+            $scriptAnalyzerRules = Get-ScriptAnalyzerRule # Just getting all default rules
 
+            # Perform analysis against each rule
             forEach ($rule in $scriptAnalyzerRules) {
                 It "should pass '$rule' rule" {
-                    If ($analysis.RuleName -contains $rule) {
-                        $analysis | Where-Object RuleName -EQ $rule -OutVariable failures | Out-Default
-                        $failures.Count | Should -Be 0
-                    }
+                    Invoke-ScriptAnalyzer -Path $functionPath -IncludeRule $rule | Should -BeNullOrEmpty
                 }
             }
         }
