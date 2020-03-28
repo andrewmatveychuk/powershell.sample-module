@@ -212,6 +212,11 @@ task UpdatePackageSpecification GenerateNewModuleVersion, {
 
 # Synopsis: Build the project
 task Build UpdateModuleManifest, UpdatePackageSpecification, {
+    # Warning on local builds
+    if(-not $env:TF_BUILD) {
+        Write-Warning "Build is running locally. Use local builds for test purpose only!"
+    }
+
     # Create versioned output folder
     $moduleOutputPath = Join-Path -Path $buildOutputPath -ChildPath $moduleName -AdditionalChildPath $newModuleVersion
     if (-not (Test-Path $moduleOutputPath)) {
