@@ -11,21 +11,20 @@
 Set-StrictMode -Version Latest
 
 # Synopsis: Default task
-task . Build
-
-# Synopsis: Build the project
-task Build UpdateModuleManifest, UpdatePackageSpecification, CopyFiles
-
-# Synopsis: Perform clean build of the project
-task CleanBuild Clean, Build
+task . Clean, Build
 
 # Setting build script variables
 $moduleName = 'SampleModule'
 $moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
+$moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
+$nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
 $buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
 
-# Setting base module version
+# Setting base module version and using it if building locally
 $newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
+
+# Setting the list of functions ot be exported by module
+$functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
 
 # Install build dependencies
 Enter-Build {
@@ -69,7 +68,7 @@ task Analyze {
     $TestResults = Invoke-Pester @Params
     if ($TestResults.FailedCount -gt 0) {
         $TestResults | Format-List
-        Write-Error "One or more PSScriptAnalyzer rules have been violated. Build cannot continue!"
+        throw "One or more PSScriptAnalyzer rules have been violated. Build cannot continue!"
     }
 }
 
@@ -110,74 +109,62 @@ task Test {
     }
 }
 
-# Synopsis: Update the module manifest with module version and functions to export
-task UpdateModuleManifest {
-    #region Generating new module version
-
+# Synopsis: Generate new module version if running via Azure DevOps pipeline
+task GenerateNewModuleVersion -If ($env:TF_BUILD) {
     # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
-    if ($env:TF_BUILD) {
 
-        #TODO: get the current version module from the NuGet feed
+    #TODO: get the current version module from the NuGet feed
 
-        # Register a target PSRepository
+    # Register a target PSRepository
 
-        # Find and install the module from the repository
-        if (Find-Module -Name $moduleName -Repository $repositoryName) {
-            try {
-                Install-Module -Name $moduleName -Repository $repositoryName
+    # Find and install the module from the repository
+    if (Find-Module -Name $moduleName -Repository $repositoryName) {
+        try {
+            Install-Module -Name $moduleName -Repository $repositoryName
 
-                # Get the largest module version
-                $currentModuleVersion = (Get-Module -Name $moduleName -ListAvailable | Measure-Object -Property 'Version' -Maximum).Maximum
+            # Get the largest module version
+            $currentModuleVersion = (Get-Module -Name $moduleName -ListAvailable | Measure-Object -Property 'Version' -Maximum).Maximum
 
-                # Set module version base numbers
-                [int]$Major = $currentModuleVersion.Major
-                [int]$Minor = $currentModuleVersion.Minor
-                [int]$Build = $currentModuleVersion.Build
+            # Set module version base numbers
+            [int]$Major = $currentModuleVersion.Major
+            [int]$Minor = $currentModuleVersion.Minor
+            [int]$Build = $currentModuleVersion.Build
 
-                # Get the count of exported module functions
-                $existingFunctionsCount = (Get-Command -Module $moduleName | Measure-Object).Count
-            }
-            catch {
-                throw "Cannot install module '$moduleName' from '$repositoryName' repository!"
-            }
-
+            # Get the count of exported module functions
+            $existingFunctionsCount = (Get-Command -Module $moduleName | Measure-Object).Count
         }
-        # In no existing module version was found, set base module version to zero
-        else {
-            [int]$Major = 0
-            [int]$Minor = 0
-            [int]$Build = 0
+        catch {
+            throw "Cannot install module '$moduleName' from '$repositoryName' repository!"
         }
 
-        # Check if new public functions were added in the current build
-        [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public" -Exclude "*.Tests.*").Count
-        [int]$newFunctionsCount = [System.Math]::Abs($sourceFunctionsCount - $existingFunctionsCount)
-
-        # Increase the minor number if any new public functions have been added
-        if ($newFunctionsCount -gt 0) {
-            [int]$Minor = $Minor + 1
-            [int]$Build = 0
-        }
-        # If not, just increase the build number
-        else {
-            [int]$Build = $Build + 1
-        }
     }
-    # When building locally, set module version base to 0.0.1
+    # In no existing module version was found, set base module version to zero
     else {
         [int]$Major = 0
         [int]$Minor = 0
-        [int]$Build = 1
+        [int]$Build = 0
+    }
 
-        Write-Warning "Build is running locally. Use local builds for test purpose only!"
+    # Check if new public functions were added in the current build
+    [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public" -Exclude "*.Tests.*").Count
+    [int]$newFunctionsCount = [System.Math]::Abs($sourceFunctionsCount - $existingFunctionsCount)
+
+    # Increase the minor number if any new public functions have been added
+    if ($newFunctionsCount -gt 0) {
+        [int]$Minor = $Minor + 1
+        [int]$Build = 0
+    }
+    # If not, just increase the build number
+    else {
+        [int]$Build = $Build + 1
     }
 
     # Update the module version object
-    $newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($Major, $Minor, $Build)
+    $Script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($Major, $Minor, $Build)
+}
 
-    #endregion
-
-    #region Generating the list of functions to be exported by module
+# Synopsis: Generate list of functions to be exported by module
+task GenerateListOfFunctionsToExport {
     # Set exported functions by finding functions exported by *.psm1 file via Export-ModuleMember
     $params = @{
         Force    = $true
@@ -193,14 +180,11 @@ task UpdateModuleManifest {
         }
     ).AddParameters($Params)
     $module = $PowerShell.Invoke()
-    $functionsToExport = $module.ExportedFunctions.Keys
+    $Script:functionsToExport = $module.ExportedFunctions.Keys
+}
 
-    #endregion
-
-    #region Updating module manifest
-
-    $moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
-
+# Synopsis: Update the module manifest with module version and functions to export
+task UpdateModuleManifest GenerateNewModuleVersion, GenerateListOfFunctionsToExport, {
     # Update-ModuleManifest parameters
     $Params = @{
         Path              = $moduleManifestPath
@@ -210,15 +194,10 @@ task UpdateModuleManifest {
 
     # Update the manifest file
     Update-ModuleManifest @Params
-
-    #endregion
 }
 
 # Synopsis: Update the NuGet package specification with module version
-task UpdatePackageSpecification {
-    # NuGet package specification
-    $nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
-
+task UpdatePackageSpecification GenerateNewModuleVersion, {
     # Load the specification into XML object
     $xml = New-Object -TypeName 'XML'
     $xml.Load($nuspecPath)
@@ -231,8 +210,8 @@ task UpdatePackageSpecification {
     $xml.Save($nuspecPath)
 }
 
-# Synopsis: Copy the module files to the target build directory
-task CopyFiles {
+# Synopsis: Build the project
+task Build UpdateModuleManifest, UpdatePackageSpecification, {
     # Create versioned output folder
     $moduleOutputPath = Join-Path -Path $buildOutputPath -ChildPath $moduleName -AdditionalChildPath $newModuleVersion
     if (-not (Test-Path $moduleOutputPath)) {
@@ -295,7 +274,7 @@ task CodeCoverage {
 
     # Fail the task if the code coverage results are not acceptable
     if ($actualCodeCoveragePercent -lt $acceptableCodeCoveragePercent) {
-        throw "The overall code coverage by Pester tests is $actualCodeCoveragePercent% which is less than quality gate of $acceptableCodeCoveragePercent%. Pester UpdatenewModuleVersion is: $((Get-Module -Name Pester -ListAvailable).UpdatenewModuleVersion)."
+        throw "The overall code coverage by Pester tests is $actualCodeCoveragePercent% which is less than quality gate of $acceptableCodeCoveragePercent%. Pester ModuleVersion is: $((Get-Module -Name Pester -ListAvailable).ModuleVersion)."
     }
 }
 
