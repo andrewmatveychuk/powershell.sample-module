@@ -166,7 +166,7 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
         # Get the count of exported module functions
         $existingFunctionsCount = (Get-Command -Module $moduleName | Where-Object -Property Version -EQ $existingPackage.Version | Measure-Object).Count
         # Check if new public functions were added in the current build
-        [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public" -Exclude "*.Tests.*").Count
+        [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public\*.ps1" -Exclude "*.Tests.*" | Measure-Object).Count
         [int]$newFunctionsCount = [System.Math]::Abs($sourceFunctionsCount - $existingFunctionsCount)
 
         # Increase the minor number if any new public functions have been added
