@@ -32,9 +32,8 @@ This project uses [InvokeBuild](https://github.com/nightroman/Invoke-Build) modu
 
 * Editing - [Visual Studio Code](https://github.com/Microsoft/vscode)
 * Runtime - [PowerShell Core](https://github.com/powershell)
+* Build tool - [InvokeBuild](https://github.com/nightroman/Invoke-Build)
+* Dependency management - [PSDepend](https://github.com/RamblingCookieMonster/PSDepend)
 * Testing - [Pester](https://github.com/Pester/Pester)
 * Code coverage - [Pester](https://pester.dev/docs/usage/code-coverage)
 * Static code analysis - [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
-* Dependency management - [PSDepend](https://github.com/RamblingCookieMonster/PSDepend)
-* Build tool - [InvokeBuild](https://github.com/nightroman/Invoke-Build)
-* Documentation generation - [PlatyPS](https://github.com/PowerShell/platyPS)
