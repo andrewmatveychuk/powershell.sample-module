@@ -19,17 +19,14 @@ Clone the repository to your local machine and look for project artifacts in the
 * [SampleModule]() - source code for the module itself along with tests
 * [SampleModule.build.ps1]() - build script for the module
 * [SampleModule.depend.psd1]() - managing module dependencies with PSDepend
-* BuildOutput - this folder will be created during the build process and will contain the build artifacts
-* docs - will contain external help in Markdown format
+* build - this folder will be created during the build process and will contain the build artifacts
 
 ## Build and Test
 
 This project uses [InvokeBuild](https://github.com/nightroman/Invoke-Build) module to automate build tasks such as running test, performing static code analysis, assembling the module, etc.
 
-* To build the module, run: Invoke-Build -Task Build
-* To run tests and code analysis: Invoke-Build
-
-Check [SampleModule.build.ps1]() file for other build tasks.
+* To build the module, run: Invoke-Build
+* To see other build options: Invoke-Build ?
 
 ## Suggested tools
 
