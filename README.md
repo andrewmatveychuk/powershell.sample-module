@@ -6,7 +6,7 @@ Sample CI/CD pipeline for a PowerShell module
 
 [![Build Status](https://dev.azure.com/matveychuk/powershell.sample-module/_apis/build/status/andrewmatveychuk.powershell.sample-module?branchName=master)](https://dev.azure.com/matveychuk/powershell.sample-module/_build/latest?definitionId=4&branchName=master)
 
-NuGet Package
+[![SampleModule package in AMGallery feed in Azure Artifacts](https://feeds.dev.azure.com/matveychuk/cb70e260-566b-4d91-9f8f-81840641e8f3/_apis/public/Packaging/Feeds/86bae25a-d541-4a81-957a-21549283fca5/Packages/683d9381-327e-4f38-9539-2c2746f52cb3/Badge)](https://dev.azure.com/matveychuk/powershell.sample-module/_packaging?_a=package&feed=86bae25a-d541-4a81-957a-21549283fca5&package=683d9381-327e-4f38-9539-2c2746f52cb3&preferRelease=true)
 
 ## Introduction
 

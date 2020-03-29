@@ -139,5 +139,5 @@ stages:
             command: 'push'
             packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
             nuGetFeedType: 'internal'
-            # publishVstsFeed: 'cb70e260-566b-4d91-9f8f-81840641e8f3/86bae25a-d541-4a81-957a-21549283fca5'
-            publishVstsFeed: 'powershell.sample-module/AMGallery'
+            # publishVstsFeed: 'powershell.sample-module/AMGallery'
+            publishVstsFeed: '$(System.TeamProject)/AMGallery'
