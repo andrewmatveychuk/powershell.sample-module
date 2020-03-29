@@ -8,6 +8,17 @@
     This script contains the tasks for building the 'SampleModule' PowerShell module
 #>
 
+Param (
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
+    [ValidateSet('Debug', 'Release')]
+    [String]
+    $Configuration = 'Debug',
+    [Parameter(ValueFromPipelineByPropertyName = $true)]
+    [ValidateNotNullOrEmpty()]
+    [String]
+    $SourceLocation
+)
+
 Set-StrictMode -Version Latest
 
 # Synopsis: Default task
@@ -109,13 +120,20 @@ task Test {
     }
 }
 
-# Synopsis: Generate new module version if running via Azure DevOps pipeline
-task GenerateNewModuleVersion -If ($env:TF_BUILD) {
+# Synopsis: Generate a new module version if creating a release build
+task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
     # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
 
-    #TODO: get the current version module from the NuGet feed
+    # Define package repository name
+    $repositoryName = $moduleName + '-repository'
 
     # Register a target PSRepository
+    try {
+        Register-PSRepository -Name $repositoryName -SourceLocation $SourceLocation -InstallationPolicy Trusted
+    }
+    catch {
+        throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
+    }
 
     # Find and install the module from the repository
     if (Find-Module -Name $moduleName -Repository $repositoryName) {
@@ -213,8 +231,8 @@ task UpdatePackageSpecification GenerateNewModuleVersion, {
 # Synopsis: Build the project
 task Build UpdateModuleManifest, UpdatePackageSpecification, {
     # Warning on local builds
-    if(-not $env:TF_BUILD) {
-        Write-Warning "Build is running locally. Use local builds for test purpose only!"
+    if ($Configuration -eq 'Debug') {
+        Write-Warning "Creating a debug build. Use it for test purpose only!"
     }
 
     # Create versioned output folder
