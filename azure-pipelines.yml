@@ -130,7 +130,7 @@ stages:
           inputs:
             buildType: 'current'
             artifactName: '$(module.Name)'
-            itemPattern: '*.nupkg'
+            itemPattern: '**/*.nupkg'
             targetPath: '$(Pipeline.Workspace)'
 
         - task: NuGetCommand@2
