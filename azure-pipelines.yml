@@ -102,7 +102,7 @@ stages:
               targetType: 'inline'
               pwsh: true
               failOnStderr: false
-              script: Invoke-Build -Task Build -Configuration Release -Sourcelocation $(module.SourceLocation)
+              script: Invoke-Build -Task Build -Configuration Release -Sourcelocation $(module.SourceLocation) -Verbose
               workingDirectory: $(System.DefaultWorkingDirectory)
 
           - task: NuGetCommand@2
