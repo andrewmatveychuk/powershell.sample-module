@@ -135,9 +135,11 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
         throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
     }
 
-    # Find and install the module from the repository
-    if (Find-Module -Name $moduleName -Repository $repositoryName) {
+    try {
+        # Look for the module package in the repository
+        Find-Module -Name $moduleName -Repository $repositoryName
         try {
+            # Install the existing module from the repository
             Install-Module -Name $moduleName -Repository $repositoryName
 
             # Get the largest module version
@@ -150,35 +152,31 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
 
             # Get the count of exported module functions
             $existingFunctionsCount = (Get-Command -Module $moduleName | Measure-Object).Count
+            # Check if new public functions were added in the current build
+            [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public" -Exclude "*.Tests.*").Count
+            [int]$newFunctionsCount = [System.Math]::Abs($sourceFunctionsCount - $existingFunctionsCount)
+
+            # Increase the minor number if any new public functions have been added
+            if ($newFunctionsCount -gt 0) {
+                [int]$Minor = $Minor + 1
+                [int]$Build = 0
+            }
+            # If not, just increase the build number
+            else {
+                [int]$Build = $Build + 1
+            }
+
+            # Update the module version object
+            $Script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($Major, $Minor, $Build)
         }
         catch {
-            throw "Cannot install module '$moduleName' from '$repositoryName' repository!"
+            throw "Cannot import module '$moduleName'!"
         }
-
     }
-    # In no existing module version was found, set base module version to zero
-    else {
-        [int]$Major = 0
-        [int]$Minor = 0
-        [int]$Build = 0
+    # In no existing module package was found, the base module version defined in the script will be used
+    catch {
+        Write-Warning "No existing package for '$moduleName' module was found in '$repositoryName' repository!"
     }
-
-    # Check if new public functions were added in the current build
-    [int]$sourceFunctionsCount = (Get-ChildItem -Path "$moduleSourcePath\Public" -Exclude "*.Tests.*").Count
-    [int]$newFunctionsCount = [System.Math]::Abs($sourceFunctionsCount - $existingFunctionsCount)
-
-    # Increase the minor number if any new public functions have been added
-    if ($newFunctionsCount -gt 0) {
-        [int]$Minor = $Minor + 1
-        [int]$Build = 0
-    }
-    # If not, just increase the build number
-    else {
-        [int]$Build = $Build + 1
-    }
-
-    # Update the module version object
-    $Script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList ($Major, $Minor, $Build)
 }
 
 # Synopsis: Generate list of functions to be exported by module
