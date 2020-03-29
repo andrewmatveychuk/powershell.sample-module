@@ -138,6 +138,6 @@ stages:
           inputs:
             command: 'push'
             packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
-            nuGetFeedType: internal
-            feedsToUse: select
+            feedsToUse: 'select'
+            vstsFeed: 'matveychuk/powershell.sample-module'
             publishVstsFeed: 'AMGallery'
