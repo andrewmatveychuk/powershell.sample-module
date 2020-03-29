@@ -4,7 +4,7 @@ Sample CI/CD pipeline for a PowerShell module
 
 ## Build Status
 
-Build Status
+[![Build Status](https://dev.azure.com/matveychuk/powershell.sample-module/_apis/build/status/andrewmatveychuk.powershell.sample-module?branchName=master)](https://dev.azure.com/matveychuk/powershell.sample-module/_build/latest?definitionId=4&branchName=master)
 
 NuGet Package
 
@@ -16,9 +16,9 @@ This repository contains the source code for a sample PowerShell module along wi
 
 Clone the repository to your local machine and look for project artifacts in the following locations:
 
-* [SampleModule]() - source code for the module itself along with tests
-* [SampleModule.build.ps1]() - build script for the module
-* [SampleModule.depend.psd1]() - managing module dependencies with PSDepend
+* [SampleModule](https://github.com/andrewmatveychuk/powershell.sample-module/tree/master/SampleModule) - source code for the module itself along with tests
+* [SampleModule.build.ps1](https://github.com/andrewmatveychuk/powershell.sample-module/blob/master/SampleModule.build.ps1) - build script for the module
+* [SampleModule.depend.psd1](https://github.com/andrewmatveychuk/powershell.sample-module/blob/master/SampleModule.depend.psd1) - managing module dependencies with PSDepend
 * build - this folder will be created during the build process and will contain the build artifacts
 
 ## Build and Test

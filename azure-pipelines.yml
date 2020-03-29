@@ -80,7 +80,7 @@ stages:
             failIfCoverageEmpty: true
 
   - stage: Build
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # Create builds only from the master branch
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master')) # Create builds only from the master branch
     jobs:
       - job: BuildJob
         steps:
@@ -120,7 +120,7 @@ stages:
               publishLocation: Container
 
   - stage: Publish
-    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # Publish the module only from the master branch
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master')) # Publish the module only from the master branch
     jobs:
     - job: PublishJob
       steps:
