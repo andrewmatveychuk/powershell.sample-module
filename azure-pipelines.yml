@@ -139,5 +139,5 @@ stages:
             command: 'push'
             packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg'
             feedsToUse: 'select'
-            vstsFeed: 'matveychuk/powershell.sample-module'
-            publishVstsFeed: 'AMGallery'
+            vstsFeed: 'powershell.sample-module/AMGallery'
+            # publishVstsFeed: 'AMGallery'
