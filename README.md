@@ -1,6 +1,10 @@
 # powershell.sample-module
 
-Sample CI/CD pipeline for a PowerShell module
+A sample CI/CD pipeline for a PowerShell module.
+
+Before starting to work with this sample project, I suggest reading the information in the following blog posts:
+
+* [A sample CI/CD pipeline for PowerShell module](https://andrewmatveychuk.com/a-sample-ci-cd-pipeline-for-powershell-module/)
 
 ## Build Status
 
