@@ -135,6 +135,9 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
         throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
     }
 
+    # Define variable for existing package
+    $existingPackage = $null
+
     try {
         # Look for the module package in the repository
         $existingPackage = Find-Module -Name $moduleName -Repository $repositoryName
