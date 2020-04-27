@@ -10,6 +10,7 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+# add some comment
 stages:
   - stage: Test
     jobs:
