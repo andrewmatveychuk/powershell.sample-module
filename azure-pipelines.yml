@@ -11,6 +11,8 @@ pool:
   vmImage: 'windows-latest'
 
 # add some comment
+
+# some changes
 stages:
   - stage: Test
     jobs:
