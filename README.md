@@ -27,7 +27,7 @@ Clone the repository to your local machine and look for project artifacts in the
 
 ## Build and Test
 
-This project uses [InvokeBuild](https://github.com/nightroman/Invoke-Build) module to automate build tasks such as running test, performing static code analysis, assembling the module, etc.
+This project uses [InvokeBuild](https://github.com/nightroman/Invoke-Build) module to automate build tasks such as running test, performing static code analysis, building the module, etc.
 
 * To build the module, run: Invoke-Build
 * To see other build options: Invoke-Build ?
