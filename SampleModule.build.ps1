@@ -24,26 +24,31 @@ Set-StrictMode -Version Latest
 # Synopsis: Default task
 task . Clean, Build
 
-# Setting build script variables
-$moduleName = 'SampleModule'
-$moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
-$moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
-$nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
-$buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
-
-# Setting base module version and using it if building locally
-$newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
-
-# Setting the list of functions ot be exported by module
-$functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
 
 # Install build dependencies
 Enter-Build {
+
+    # Installing PSDepend for dependency management
     if (-not (Get-Module -Name PSDepend -ListAvailable)) {
         Install-Module PSDepend -Force
     }
     Import-Module PSDepend
+
+    # Installing dependencies
     Invoke-PSDepend -Force
+
+    # Setting build script variables
+    $script:moduleName = 'SampleModule'
+    $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
+    $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
+    $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
+    $script:buildOutputPath = Join-Path -Path $BuildRoot -ChildPath 'build'
+
+    # Setting base module version and using it if building locally
+    $script:newModuleVersion = New-Object -TypeName 'System.Version' -ArgumentList (0, 0, 1)
+
+    # Setting the list of functions ot be exported by module
+    $script:functionsToExport = (Test-ModuleManifest $moduleManifestPath).ExportedFunctions
 }
 
 # Synopsis: Analyze the project with PSScriptAnalyzer
