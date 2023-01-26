@@ -37,6 +37,10 @@ Enter-Build {
     # Installing dependencies
     Invoke-PSDepend -Force
 
+    # Removing all loaded versions of Pester and importing the specific Pester 4 version
+    Get-Module -Name Pester | Remove-Module
+    Import-Module -Name Pester -RequiredVersion 4.10.1
+
     # Setting build script variables
     $script:moduleName = 'SampleModule'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
