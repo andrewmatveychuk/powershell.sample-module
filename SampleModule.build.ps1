@@ -61,11 +61,15 @@ task Analyze {
     }
 
     $TestFiles = Get-ChildItem @Params
-
-    # Pester parameters
-    $Params = @{
-        Path     = $TestFiles
-        PassThru = $true
+    
+    $Config = New-PesterConfiguration @{
+        Run = @{
+            Path = $TestFiles
+            Exit = $true
+        }
+        TestResult = @{
+            Enabled = $true
+        }
     }
 
     # Additional parameters on Azure Pipelines agents to generate test results
@@ -76,16 +80,11 @@ task Analyze {
         $Timestamp = Get-date -UFormat "%Y%m%d-%H%M%S"
         $PSVersion = $PSVersionTable.PSVersion.Major
         $TestResultFile = "AnalysisResults_PS$PSVersion`_$TimeStamp.xml"
-        $Params.Add("OutputFile", "$buildOutputPath\$TestResultFile")
-        $Params.Add("OutputFormat", "NUnitXml")
+        $Config.TestResult.OutputPath = "$buildOutputPath\$TestResultFile"
     }
 
     # Invoke all tests
-    $TestResults = Invoke-Pester @Params
-    if ($TestResults.FailedCount -gt 0) {
-        $TestResults | Format-List
-        throw "One or more PSScriptAnalyzer rules have been violated. Build cannot continue!"
-    }
+    Invoke-Pester -Configuration $Config
 }
 
 # Synopsis: Test the project with Pester tests
@@ -94,11 +93,8 @@ task Test {
     
     $Config = New-PesterConfiguration @{
         Run = @{
-            Path     = $TestFiles
-            Exit     = $true
-        }
-        Output = @{
-            Verbosity = 'Normal'
+            Path = $TestFiles
+            Exit = $true
         }
         TestResult = @{
             Enabled = $true
@@ -115,7 +111,6 @@ task Test {
         $PSVersion = $PSVersionTable.PSVersion.Major
         $TestResultFile = "TestResults_PS$PSVersion`_$TimeStamp.xml"
         $Config.TestResult.OutputPath = "$buildOutputPath\$TestResultFile"
-        $Config.TestResult.OutputFormat = 'NUnitXml'
     }
 
     # Invoke all tests
