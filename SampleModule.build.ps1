@@ -306,6 +306,6 @@ task CodeCoverage {
 # Synopsis: Clean up the target build directory
 task Clean {
     if (Test-Path $buildOutputPath) {
-        Remove-Item –Path $buildOutputPath –Recurse
+        Remove-Item -Path $buildOutputPath -Recurse
     }
 }
