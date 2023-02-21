@@ -54,13 +54,7 @@ Enter-Build {
 # Synopsis: Analyze the project with PSScriptAnalyzer
 task Analyze {
     # Get-ChildItem parameters
-    $Params = @{
-        Path    = $moduleSourcePath
-        Recurse = $true
-        Include = "*.PSSATests.*"
-    }
-
-    $TestFiles = Get-ChildItem @Params
+    $TestFiles = Get-ChildItem -Path $moduleSourcePath -Recurse -Include "*.PSSATests.*"
     
     $Config = New-PesterConfiguration @{
         Run = @{
