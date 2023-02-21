@@ -57,7 +57,7 @@ task Analyze {
     $Params = @{
         Path    = $moduleSourcePath
         Recurse = $true
-        Include = "*.PSSA.Tests.*"
+        Include = "*.PSSATests.*"
     }
 
     $TestFiles = Get-ChildItem @Params
