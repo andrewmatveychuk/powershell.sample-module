@@ -1,6 +1,6 @@
 @{
     # Build dependencies
-    Pester                     = @{ target = 'CurrentUser'; version = '4.10.1' }
+    Pester                     = @{ target = 'CurrentUser'; version = 'latest' }
     PSScriptAnalyzer           = @{ target = 'CurrentUser'; version = 'latest' }
     PlatyPS                    = @{ target = 'CurrentUser'; version = 'latest' }
 }
